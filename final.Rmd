@@ -1,0 +1,590 @@
+---
+title: "Final Project"
+author: "Chatzimoschou Angeliki"
+output: word_document
+---
+install.packages("agricolae")
+install.packages("lattice")
+install.packages("moments")
+
+## Question	1
+
+```{r}
+options(scipen=999)
+
+Lottery_Data<-read.csv("Lottery_Data.csv", header=FALSE)
+lotteryVector<-as.vector(as.matrix(Lottery_Data))
+``` 
+
+#a)
+```{r}
+counts<-table(lotteryVector)
+chisq.test(counts)
+barplot(counts,main="Barplot of numbers drawn",xlab="Number",col="purple")
+```
+
+p-value < 0.00000000000000022<0.05, we reject Ho:fair dice, which is confirmed also from our diagram.
+
+#b) 
+**I would prefer the numbers: 1 and 30 as they are the most frequent.**
+ 
+
+#c)
+```{r}
+Lottery_Data2<-Lottery_Data[1:100,]
+lotteryVector2<-as.vector(as.matrix(Lottery_Data2))
+counts2<-table(lotteryVector2)
+chisq.test(counts2)
+barplot(counts2,main="Histogram of numbers drawn",xlab="Number",col="red")
+```
+**p-value = 0.1009>0.05,Ho:fair dice, cannot be rejected, which is confirmed by the barplot too.**
+
+```{r}
+Lottery_Data3<-Lottery_Data[1:1000,]
+lotteryVector3<-as.vector(as.matrix(Lottery_Data3))
+counts3<-table(lotteryVector3)
+chisq.test(counts3)
+barplot(counts3,main="Histogram of numbers drawn",xlab="Number",col="green")
+
+rm(Lottery_Data)
+```
+**p-value < 0.00000000000000022<0.05, Ho:fair dice rejected, which is confirmed by our barplot too.
+I would prefer the numbers: 1 and 30 as they are the most frequent.**
+
+
+## Question 2
+
+```{r}
+W<-read.csv2("W.csv",header=TRUE,sep=";")
+X<-read.csv2("X.csv",header=TRUE,sep=";")
+Y<-read.csv2("Y.csv",header=TRUE,sep=";")
+Z<-read.csv2("Z.csv",header=TRUE,sep=";")
+```
+
+#a)
+```{r}
+layout(matrix(1:4,2,2))
+
+W<-W$BAPT1534
+W<-as.data.frame(W)
+
+X<-X$BAPT1534
+X<-as.data.frame(X)
+
+Y<-Y$BAPT1534
+Y<-as.data.frame(Y)
+
+Z<-Z$BAPT1534
+Z<-as.data.frame(Z)
+
+summary(W)
+summary(X)
+summary(Y)
+summary(Z)
+```
+
+**We get barplots for numerical discrete variables W and X.**
+```{r}  
+countsW<-table(W)
+barplot(countsW,main='W', xlab="W",col="purple")
+
+countsX<-table(X)
+barplot(countsX,main='X', xlab="X",col="red")
+```
+
+**We get histograms for numerical continuous variables Y and Z.**
+```{r}
+hist(Y$Y,main='Y', xlab="Y",col="lightblue")
+
+hist(Z$Z,main='Z', xlab="Z",col="lightgreen")
+```
+
+**Observing the histogram of Y, it seems that we must transform Y by taking its log.**
+```{r}
+Y<-log(Y)
+hist(Y$Y,main='Y', xlab="Y",col="lightblue")
+```
+
+**Density Plots**
+```{r}
+plot(density(W$W),col="purple",main="W")
+polygon(density(W$W),col="purple",border="red")
+
+plot(density(X$X),col="grey",main="X")
+polygon(density(X$X),col="grey",border="red")
+
+plot(density(Y$Y),col="lightblue",main="Y")
+polygon(density(Y$Y),col="lightblue",border="red")
+
+plot(density(Z$Z),col="lightgreen",main="Z")
+polygon(density(Z$Z),col="lightgreen",border="red")
+```
+
+**Boxplots**
+```{r}
+boxplot(W, col="purple",main="W",xlab="mean and quantiles")
+boxplot(X, col="red",main="X", xlab="mean and quantiles")
+boxplot(Y, col="lightblue", main="Y", xlab="mean and quantiles")
+boxplot(Z, col="lightgreen", main="Z", xlab="mean and quantiles")
+```
+
+
+#b)
+
+**Mean,Median,Mode,Variance.**
+```{r}
+mode<-function(v) {
+   uniqv<-unique(v)
+   table<-tabulate(match(v,uniqv))
+   uniqv[which.max(table)]
+}
+
+mean(W$W)
+median(W$W)
+mode(W$W)
+var(W$W)
+
+mean(X$X)
+median(X$X)
+mode(X$X)
+var(X$X)
+
+mean(Y$Y)
+median(Y$Y)
+mode(Y$Y)
+var(Y$Y)
+
+mean(Z$Z)
+median(Z$Z)
+mode(Z$Z)
+var(Z$Z)
+```
+
+**Skewness**
+```{r}
+library("moments")
+
+skewness(W$W)
+skewness(X$X)
+skewness(Y$Y)
+skewness(Z$Z)
+```
+**Y and Z are close to symmetric, while W and X are right skewed.** 
+
+**Kurtosis**
+```{r}
+kurtosis(W$W)
+kurtosis(X$X)
+kurtosis(Y$Y)
+kurtosis(Z$Z)
+
+rm(W)
+rm(X)
+rm(Y)
+rm(Z)
+```
+**Y, Z and W have kurtosis very close to 3.0, X is slightly leptocurtic.**
+
+
+## Question 3
+
+#a)
+```{r}
+Data.3<-read.csv2("Data 3.csv")
+attach(Data.3)
+summary(Data.3)
+```
+
+#i)
+```{r}
+layout(matrix(1:4,2,2))
+
+# Boxplot of Y and W
+boxplot(Y~W,data=Data.3,main="Y vs W",xlab="W",ylab="Y",names=c("A","B","C"))
+
+# Boxplot of X1 by W
+boxplot(X1~W,data=Data.3,main="X1 vs W",xlab="W",ylab="X1",names=c("A","B","C"))
+
+# Boxplot of X2 by W
+boxplot(X2~W,data=Data.3,main="X2 vs W",xlab="W",ylab="X2",names=c("A","B","C"))
+
+# Boxplot of X3 by W
+boxplot(X3~W,data=Data.3,main="X3 vs W",xlab="W",ylab="X3",names=c("A","B","C"))
+```
+**As we observe from all four boxplots the assumption of homogeneity of variances is violated and the 
+factors means are not equal.**
+
+
+#ii)
+```{r}
+# ANOVA of Y by W
+Y.fit<-aov(Y~W,data=Data.3)
+Y.fit
+summary(Y.fit)
+```
+**p-value<0.0000000000000002<0.05, H0:means equality rejected,which means that the means Yi are not equal between groups A, B and C.**
+
+```{r}
+# ANOVA of X1 and W
+X1.fit<-aov(X1~W,data=Data.3)
+X1.fit
+summary(X1.fit)
+```
+**p-value<0.0000000000000002<0.05, H0:means equality rejected,which means that the means Yi are not equal between groups A, B and C.**
+
+```{r}
+# ANOVA of X2 and W 
+X2.fit<-aov(X2~W, data=Data.3)
+X2.fit
+summary(X2.fit)
+```
+**p-value<0.0000000000000002<0.05, H0:means equality rejected,which means that the means Yi are not equal between groups A, B and C.**
+
+```{r}
+# ANOVA of X3 and W
+X3.fit <- aov(X3~W , data=Data.3)
+X3.fit
+summary(X3.fit)
+```
+**p-value<0.0000000000000002<0.05, H0:means equality rejected,which means that the means Yi are not equal between groups A, B and C.**
+
+
+#iii)
+```{r}
+layout(matrix(1:4,2,2))
+
+#Diagnostic Plots for Y
+plot(Y.fit)
+```
+**From the diagnostic plots we observe that normality of residuals cannot be rejected but the  homogeneity of variances gets rejected.**
+
+```{r}
+shapiro.test(Y.fit$residuals)
+```
+**p-value = 0.2189>0.05, Ho:normality of residuals cannot be rejected.**
+
+
+```{r}
+bartlett.test(Y~W,data=Data.3)
+```
+**p-value = 0.0003345<0.05, Ho:homogeneity of variances of Y rejected.**
+
+```{r}
+#Diagnostic Plots for X1
+plot(X1.fit)
+```
+**From the diagnostic plots we observe that normality of residuals and homogeneity of variances cannot get rejected.**
+
+```{r}
+shapiro.test(X1.fit$residuals)
+```
+**p-value = 0.323>0.05, Ho:normality of residuals cannot be rejected.**
+
+```{r}
+bartlett.test(X1~W,data=Data.3)
+```
+**p-value = 0.3515>0.05, Ho:homogeneity of variances of X1 cannot be rejected.**
+
+```{r}
+#Diagnostic Plots for X2
+plot(X2.fit)
+```
+**From the diagnostic plots we observe that normality of residuals and homogeneity of variances get rejected.**
+
+```{r}
+shapiro.test(X2.fit$residuals)
+```
+**p-value = 0.03676<0.05, Ho:normality of residuals rejected.**
+
+```{r}
+bartlett.test(X2~W,data=Data.3)
+```
+**p-value = 0.0000000000009229<0.05, Ho:homogeneity of variances of X2 rejected.**
+
+```{r}
+#Diagnostic Plots for X3
+plot(X3.fit)
+```
+**From the diagnostic plots we observe that normality of residuals and homogeneity of variances get rejected.**
+
+```{r}
+shapiro.test(X3.fit$residuals)
+```
+**p-value = 0.003866<0.05, Ho:normality of residuals rejected.**
+
+```{r}
+bartlett.test(X3~W,data=Data.3)
+```
+**p-value = 0.000000003055<0.05, Ho:homogeneity of variances of X3 rejected.** 
+
+#iv)
+```{r}
+TukeyHSD(Y.fit) 
+TukeyHSD(X1.fit)
+TukeyHSD(X2.fit)
+TukeyHSD(X3.fit)
+```
+**All of the intervals do not contain 0s, which means that there are significant differences in the pair of groups examined.Furthermore, all of the p-adjusted are 0.**
+
+```{r}
+library("agricolae")
+
+DFE<-Y.fit$df.residual
+MSE<-deviance(Y.fit)/DFE
+
+print(LSD.test(Y,W,DFerror=DFE,MSerror=MSE, p.adj="bonferroni"))$statistics
+
+
+DFE<-X1.fit$df.residual
+MSE<-deviance(X1.fit)/DFE
+
+print(LSD.test(X1,W,DFerror=DFE,MSerror=MSE, p.adj="bonferroni"))$statistics
+```
+
+#b)
+```{r}
+# Non-parametric one-way ANOVA for Y
+kruskal.test(Y~W,data=Data.3)
+
+# Non-parametric one-way ANOVA for X1
+kruskal.test(X1~W,data=Data.3)
+
+# Non-parametric one-way ANOVA for X2
+kruskal.test(X2~W,data=Data.3)
+
+# Non-parametric one-way ANOVA for X3
+kruskal.test(X3~W,data=Data.3)
+```
+**All p-value < 0.00000000000000022<0.05, All the the response variables are stochastically different in at least one of the groups defined by the categorical W.**
+
+#c)
+```{r}
+pairs(~Y+X1+X2+X3,data=Data.3, main="Scatterplot matrix of Y, X1, X2, X3")
+```
+
+#d)
+```{r}
+library(lattice)
+
+super.sym <- trellis.par.get("superpose.symbol")
+
+splom(Data.3[c(1,2,3,4)], groups=Data.3[,5],panel=panel.superpose,key=list(title="different levels of W",columns=3,points=list(pch=super.sym$pch[1:3],col=super.sym$col[1:3]),text=list(c("W=A","W=B","W=C"))))
+```
+
+#e)
+```{r}
+fit<-lm(Y~X1+X2+X3,data=Data.3)
+fit
+summary(fit)
+```
+
+#f)
+```{r}
+plot(fit)
+```
+** Normality of the residuals (Normal Q-Q) and homoscedasticity (Residuals vs Fitted and Scale-Location) cannot be rejected.**
+
+```{r}
+shapiro.test(fit$residuals)
+```
+**p-value = 0.9349>0.05, Ho:normality of residuals cannot be rejected.**
+
+#g)
+```{r}
+Y_full<-lm(Y~X1+X2+X3,data=Data.3)
+Y1<-lm(Y~X2+X3,data=Data.3)
+Y2<-lm(Y~X1+X3,data=Data.3)
+Y3<-lm(Y~X1+X2,data=Data.3)
+
+#comparison Y_full vs Y1
+comp.1<-anova(Y_full,Y1)
+comp.1
+
+#comparison Y_full vs Y2
+comp.2<-anova(Y_full,Y2)
+comp.2
+
+#comparison Y_full vs Y3
+comp.3<-anova(Y_full,Y3)
+comp.3
+```
+**All p-value< 0.00000000000000022<0.05, All Ho: coefficient of X1,X2,X3 are zero get rejected,
+which means that all three variables must be included in the model as they provide statistically significant information in predicting Y. The best model is the one that contains all three predictor variables
+(X1,X2,X3).**
+
+#h)
+```{r}
+predict(Y_full, data.frame(X1=3.1,X2=3.75,X3=1.2), interval="confidence",level=0.95)
+rm(Data.3)
+```
+
+
+
+## Question	4
+
+```{r}
+Data4 <- read.csv("C:/Users/Angelica/Desktop/final/Data4.csv")
+attach(Data4)
+summary(Data4)
+```
+
+#a)
+```{r}
+plot(W,Y,col = "red", main=" Y vs W ")
+```
+  
+**We observe that lvl A of factor W has higher values of Y (and higher mean) than lvl B, which has wider variance**
+  
+```{r}
+plot(Z,Y,col = "red",  main=" Y vs Z ")
+```
+
+**We observe that lvl L of factor Z has higher values of Y (and higher mean) than lvl H, which has wider variance**  
+  
+  
+#b)
+```{r}
+interaction.plot(W,Z,Y,col=c(1:2), type="b", leg.bty ="o", lwd=2, pch=c(18,24), trace.label="Factor Z", xlab="Factor W", ylab=("mean of Y"),main=("Interaction Plot of mean Y per lvls of Factors W and Z") )
+```
+
+**The lines are not completely parallel, so we conclude that there is slight interaction**
+ 
+
+#c)
+```{r}
+int<-aov(Y~W*Z)
+int
+summary(int)
+```  
+**We conclude that factors W and Z are statistically significant but their interaction W:Z is not.**  
+
+```{r}
+layout(matrix(1:4,2,2))
+plot(int)
+```
+** We observe that the normality assumption (Normal Q-Q plot) and homoscedasticity assumption (Residuals vd Fitted,Scale Location vs Fitted) are getting violated.**
+
+```{r}
+shapiro.test(int$residuals)
+```
+**p-value = 0.000001356<0.05, normality of residuals rejected**
+
+```{r}
+bartlett.test(split(Y,list(W,Z)))
+rm(Data4)
+```
+**p-value = 0.001585<0.05, homoscedasticity rejected.**
+
+
+## Question	5 
+
+```{r}
+Data5<-read.csv("Data5.csv")
+summary(Data5)
+```
+
+#a)
+```{r}
+par(mfrow=c(1,1))
+plot(Data5$T,Data5$Y,col=Data5$D)
+```
+
+#b)
+```{r}
+data5A<-subset(Data5,D=="A")
+data5B<-subset(Data5,D=="B")
+data5C<-subset(Data5,D=="C")
+data5D<-subset(Data5,D=="D")
+
+fit1<-lm(data5A$Y~data5A$T)
+fit1
+summary(fit1)
+
+
+fit2<-lm(data5B$Y~data5B$T)
+fit2
+summary(fit2)
+
+
+fit3<-lm(data5C$Y~data5C$T)
+fit3
+summary(fit3)
+
+
+fit4<-lm(data5D$Y~data5D$T)
+fit4
+summary(fit4)
+```
+
+#c)
+```{r}
+plot(fit1)
+```
+**From the diagnostic plots we conclude that the assumptions of normality and homoscedastity of residuals are violated**
+```{r}  
+shapiro.test(fit1$residuals)
+```
+**p-value = 0.0000002231<0.05, normality rejected**
+
+```{r}
+bartlett.test(data5A$Y~data5A$T)
+```
+**p-value < 0.00000000000000022<0.05, homoscedasticity rejected**
+
+```{r}
+plot(fit2)
+```
+**From the diagnostic plots we conclude that the assumptions of normality and homoscedastity of residuals are violated**
+
+```{r}  
+shapiro.test(fit2$residuals)
+```
+**p-value = 0.00000009141<0.05, normality rejected**
+
+```{r}
+bartlett.test(data5B$Y~data5B$T)
+```
+**p-value < 0.00000000000000022<0.05, homoscedasticity rejected**
+
+
+```{r}
+plot(fit3)
+```
+**From the diagnostic plots we conclude that the assumptions of normality and homoscedastity of residuals are violated**
+
+```{r}  
+shapiro.test(fit3$residuals)
+```
+**p-value = 0.0003652<0.05, normality rejected**
+
+```{r}
+bartlett.test(data5C$Y~data5C$T)
+```
+**p-value < 0.00000000000000022<0.05, homoscedasticity rejected**
+
+```{r}
+plot(fit4)
+```
+**From the diagnostic plots we conclude that the assumptions of normality and homoscedastity of residuals are violated**
+
+```{r}  
+shapiro.test(fit4$residuals)
+```
+**p-value = 0.000001277<0.05, normality rejected**
+
+```{r}
+bartlett.test(data5D$Y~data5D$T)
+```
+**p-value < 0.00000000000000022<0.05, homoscedasticity rejected**
+
+**We conclude that the assumptions of normality and homoscedasticiry are violated in all of our fit models.
+In order to fix this, I tried several transformations ( X^2, sqrt(X), log(X),1/X, boxcox ) but none of them gave a significant better result.**
+
+#d)
+```{r}
+summary(fit1)
+summary(fit2)
+summary(fit3)
+summary(fit4)
+```
+**In all four regression models, the coefficients are statistically significant at any chosen significance level (1% or 5%). In addition, soil type "C" has the biggest impact as the coefficient of T in the third regression model is the largest than in all the other models.**
